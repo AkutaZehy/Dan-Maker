@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dan Maker — Editor (final)</title>
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+  <div id="app" class="app layout-desktop">
+    <header class="topbar">
+      <div class="brand">Dan Maker</div>
+      <div class="muted">Individual & Marathon — editor</div>
+    </header>
+
+    <main class="grid">
+      <!-- LEFT (minimal) -->
+      <aside class="left panel">
+        <div class="panel-section">
+          <div class="section-title">Actions</div>
+          <div style="display:flex;gap:8px;flex-direction:column">
+            <button id="downloadBtn" class="btn">Download PNG</button>
+            <button id="exportPreset" class="smallBtn">Export Preset</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- PREVIEW -->
+      <section class="previewWrap panel" id="previewWrap">
+        <div class="previewTop">
+          <div><strong>Preview</strong></div>
+          <div class="row">
+            <div class="mutedNote">Canvas is live — click elements to select</div>
+          </div>
+        </div>
+
+        <div class="canvasArea">
+          <div class="canvasContainer" id="canvasContainer">
+            <canvas id="stage" width="1920" height="1080" title="Drop images here"></canvas>
+            <div id="overlayContainer" class="overlayContainer" aria-hidden="true"></div>
+          </div>
+
+          <div id="marListWrap" class="marListWrap">
+            <div id="marList" class="marList" aria-label="Marathon images"></div>
+          </div>
+
+          <div id="tips" class="tips">
+            <div class="mutedNote">Tip: Click symbol pixels (not transparent) to select symbol. Click slots or thumbnails to select marathon slot. Drag empty canvas area to pan background (when Individual background selected).</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT -->
+      <aside class="right panel" id="rightPanel">
+        <div class="scrollArea">
+
+          <div class="panel-section">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div class="section-title">Mode</div>
+              <div id="modeHint" class="mutedNote">Switch mode</div>
+            </div>
+            <div id="modeToggle" class="segmented" style="margin-bottom:12px"></div>
+          </div>
+
+          <div class="panel-section">
+            <div class="section-title">Symbols</div>
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+              <button id="openSymbolPicker" class="iconGridBtn" title="Open symbol picker">
+                <div class="gridIcon">
+                  <div class="gcell">α</div><div class="gcell">β</div><div class="gcell">γ</div><div class="gcell">δ</div>
+                </div>
+              </button>
+              <div style="flex:1">
+                <div style="display:flex;gap:8px;align-items:center">
+                  <label class="mutedNote">Zoom</label>
+                  <div style="flex:1"><input id="symbolZoom" type="range" min="5" max="300" step="1" value="36"></div>
+                  <input id="symbolZoomVal" class="numInput" value="36" /> <div class="mutedNote">%</div>
+                </div>
+
+                <div style="display:flex;gap:8px;align-items:start;margin-top:8px">
+                  <div style="flex:1">
+                    <div class="mutedNote">Symbol color</div>
+                    <div class="verticalColorSliders">
+                      <div>R <input id="sR" type="range" min="0" max="255" value="255"> <input id="sRval" class="numInput" value="255"></div>
+                      <div>G <input id="sG" type="range" min="0" max="255" value="255"> <input id="sGval" class="numInput" value="255"></div>
+                      <div>B <input id="sB" type="range" min="0" max="255" value="255"> <input id="sBval" class="numInput" value="255"></div>
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                    <div id="symbolColorPreview" class="bigColorPreview" title="Symbol color preview"></div>
+                    <button id="toggleSymbolEye" class="smallBtn">👁</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:10px">
+              <div class="mutedNote">Editing target</div>
+              <select id="editTargetSelect" class="slotSelect" aria-label="Choose editing target">
+                <option value="symbol">Symbol</option>
+                <option value="individual">Individual background</option>
+                <option value="marathon">Marathon slot image</option>
+              </select>
+              <div id="selectedLabel" class="mutedNote" style="margin-top:6px">Selected: None</div>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <div class="mutedNote">Transform (real-time)</div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+              <div style="flex:1">Zoom <input id="zoom" type="range" min="10" max="400" step="1" value="100"></div>
+              <input id="zoomVal" class="numInput" value="100" /> <div class="mutedNote">%</div>
+            </div>
+
+            <div style="margin-top:8px">
+              <label><input id="advToggle" type="checkbox"> Advanced (X/Y)</label>
+              <div id="advancedControls" style="display:none;margin-top:8px">
+                <div style="display:flex;gap:8px;align-items:center">
+                  <div style="flex:1">Scale X <input id="editScaleX" type="range" min="50" max="200" step="1" value="100"></div>
+                  <input id="scaleXVal" class="numInput" value="100" /> <div class="mutedNote">%</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+                  <div style="flex:1">Scale Y <input id="editScaleY" type="range" min="50" max="200" step="1" value="100"></div>
+                  <input id="scaleYVal" class="numInput" value="100" /> <div class="mutedNote">%</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div style="flex:1">Rotate <input id="editRotate" type="range" min="-180" max="180" step="1" value="0"></div>
+              <input id="rotateVal" class="numInput" value="0" /> <div class="mutedNote">°</div>
+            </div>
+
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <button id="resetTransform" class="smallBtn">Reset</button>
+              <button id="snapSlots" class="smallBtn">Snap slots</button>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <div class="mutedNote" style="display:flex;justify-content:space-between;align-items:center">
+              <div>Shaders</div>
+              <label style="font-size:12px"><input id="masterShaders" type="checkbox"> Enable</label>
+            </div>
+
+            <div id="shadersPanel" style="display:none;margin-top:8px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <label><input id="chkGlitch" type="checkbox"> Glitch</label>
+                <div style="flex:1">Intensity <input id="glitchIntensity" type="range" min="0" max="100" step="1" value="30"></div>
+                <input id="glitchVal" class="numInput" value="30">
+                <button id="regenGlitch" class="smallBtn">Regenerate</button>
+              </div>
+
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <label><input id="chkRGB" type="checkbox"> RGB Shift</label>
+                <div style="flex:1">Intensity <input id="rgbIntensity" type="range" min="0" max="200" step="1" value="20"></div>
+                <input id="rgbVal" class="numInput" value="20">
+              </div>
+
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <label><input id="chkWave" type="checkbox"> Wave</label>
+                <div style="flex:1">Intensity <input id="waveIntensity" type="range" min="0" max="100" step="1" value="10"></div>
+                <input id="waveVal" class="numInput" value="10">
+              </div>
+
+              <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+                <label><input id="shadersOnlyBG" type="checkbox"> Apply only to Background</label>
+                <label><input id="shadersWhole" type="checkbox"> Apply to Whole image</label>
+              </div>
+            </div>
+          </div>
+
+          <div id="borderPanel" class="panel-section">
+            <div class="section-title">Border (Marathon)</div>
+            <div id="borderTabs" class="segmented" style="margin-bottom:8px"></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button id="addBorderBtn" class="smallBtn greenBtn">Upload border</button>
+              <input id="borderUpload" type="file" accept="image/*" style="display:none">
+              <div id="borderPreview" class="thumbPreview"></div>
+            </div>
+
+            <div id="borderTintControls" style="margin-top:8px;display:none">
+              <div class="mutedNote">Border tint</div>
+              <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+                <div>R <input id="tR" type="range" min="0" max="255" value="255"> <input id="tRval" class="numInput" value="255"></div>
+                <div>G <input id="tG" type="range" min="0" max="255" value="255"> <input id="tGval" class="numInput" value="255"></div>
+                <div>B <input id="tB" type="range" min="0" max="255" value="255"> <input id="tBval" class="numInput" value="255"></div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+                <div id="borderColorPreview" class="bigColorPreview"></div>
+                <label><input id="applyBorderTint" type="checkbox" checked> Apply tint</label>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- scrollArea -->
+      </aside>
+    </main>
+
+    <!-- modal & overlay -->
+    <div id="pickerOverlay" class="pickerOverlay" style="display:none"></div>
+    <div id="pickerModal" class="modal" style="display:none"></div>
+
+    <!-- Export size modal -->
+    <div id="exportOverlay" class="pickerOverlay" style="display:none"></div>
+    <div id="exportModal" class="modal" style="display:none;min-width:360px">
+      <div class="section-title">Export size</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <label><input name="sizeOpt" type="radio" value="1920x1080" checked> Full HD — 1920×1080</label>
+        <label><input name="sizeOpt" type="radio" value="1280x720"> HD — 1280×720</label>
+        <label><input name="sizeOpt" type="radio" value="2560x1440"> 2K — 2560×1440</label>
+        <label><input name="sizeOpt" type="radio" value="3840x2160"> 4K — 3840×2160</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label>Custom:</label>
+          <input id="customW" class="numInput" value="1920"> × <input id="customH" class="numInput" value="1080">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button id="doExport" class="btn">Download</button>
+          <button id="cancelExport" class="smallBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<script src="js/utils.js"></script>
+<script src="js/state.js"></script>
+<script src="js/render.js"></script>
+<script src="js/effects.js"></script>
+<script src="js/symbolPicker.js"></script>
+<script src="js/borderControls.js"></script>
+<script src="js/dragOffset.js"></script>
+<script src="js/transform.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

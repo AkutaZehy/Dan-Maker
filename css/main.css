@@ -1,0 +1,66 @@
+:root{
+  --bg1:#021026; --bg2:#081124; --panel:#0c0c10; --muted:#9aa9b8; --accent1:#6ec1ff; --accent2:#9b6bff; --white:#eef2ff; --green:#1fa85a;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--white);overflow:hidden}
+.app{max-width:1300px;margin:18px auto;padding:12px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.brand{font-weight:700;font-size:18px}
+.muted{color:var(--muted);font-size:13px}
+
+/* Grid layout */
+.grid{display:grid;grid-template-columns:200px 1fr 360px;gap:14px;align-items:start;height:calc(100vh - 64px)}
+.panel{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 36px rgba(0,0,0,0.6);overflow:hidden}
+.previewWrap{min-height:460px}
+
+/* responsive */
+@media (max-width:980px){
+  .grid{grid-template-columns:1fr;gap:12px;height:auto}
+}
+
+/* controls */
+.btn{padding:8px 12px;border-radius:8px;border:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#031018;cursor:pointer;font-weight:700}
+.smallBtn{padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--white);cursor:pointer}
+.greenBtn{background:linear-gradient(90deg,#22c46b,#1fa85a);border:0;color:#01210b}
+.segmented{display:flex;gap:8px}
+.segmented button{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted);cursor:pointer}
+.segmented button.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#021;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
+
+/* preview area */
+.previewTop{display:flex;justify-content:space-between;align-items:center}
+.canvasArea{display:flex;flex-direction:column;gap:12px;height:100%}
+.canvasContainer{position:relative;overflow:hidden;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:10px;aspect-ratio:16/9;max-height:65vh}
+.canvasContainer canvas{width:100%;height:100%;border-radius:6px;display:block;cursor:crosshair;border:1px solid rgba(255,255,255,0.03)}
+.overlayContainer{position:absolute;left:10px;top:10px;right:10px;bottom:10px;pointer-events:none}
+.hint{font-size:12px;color:var(--muted);margin-top:8px}
+.tips{margin-top:8px;color:var(--muted);font-size:12px}
+
+/* mar list below canvas (fixed height, prevents page growth) */
+.marListWrap{overflow:hidden;height:100px}
+.marList{display:flex;gap:8px;overflow:auto;padding:8px 4px;height:100%}
+.marItem{min-width:140px;border-radius:8px;padding:6px;background:rgba(255,255,255,0.02);display:flex;gap:8px;align-items:center}
+.marItem img{width:84px;height:56px;object-fit:cover;border-radius:6px}
+
+/* right panel scroll area */
+.right .scrollArea{height:calc(100vh - 160px);overflow:auto;padding-right:6px}
+
+/* small utilities */
+.section-title{font-size:13px;color:var(--muted);margin-bottom:6px}
+.mutedNote{font-size:12px;color:var(--muted)}
+.colorPreview{width:38px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.06)}
+.bigColorPreview{width:56px;height:44px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)}
+.thumbPreview{width:40px;height:40px;border-radius:6px;background:rgba(255,255,255,0.02);display:inline-block;vertical-align:middle;overflow:hidden}
+.valueLabel{min-width:42px;text-align:right;font-weight:700;color:var(--muted)}
+.smallVal{display:inline-block;min-width:32px;text-align:right;color:var(--muted);}
+.numInput{width:56px;padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.25);color:var(--white);text-align:center}
+
+/* ranges */
+input[type=range]{-webkit-appearance:none;height:22px;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:6px;background:rgba(255,255,255,0.08)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,0.5);margin-top:-5px}
+input[type=range]:focus{outline:none}
+
+/* icon grid button */
+.iconGridBtn{width:56px;height:56px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.gridIcon{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;width:34px;height:34px}
+.gridIcon .gcell{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:rgba(255,255,255,0.9)}

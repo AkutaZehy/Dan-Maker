@@ -1,0 +1,10 @@
+/* modal & picker */
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1001;background:var(--panel);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 30px 80px rgba(0,0,0,0.7);max-height:70vh;overflow:auto;min-width:520px}
+.pickerOverlay{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:1000}
+
+/* picker grid & thumbnails */
+.pickerSection{margin-bottom:10px}
+.pickerGrid{display:grid;grid-template-columns:repeat(6,56px);gap:8px}
+.thumb{width:56px;height:56px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;border:2px solid transparent}
+.thumb img{max-width:100%;max-height:100%;object-fit:contain}
+.thumb.add{background:linear-gradient(180deg,#0f5f30,#0fab48);color:white;font-weight:700;display:flex;align-items:center;justify-content:center;padding-top:2px}
