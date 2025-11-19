@@ -28,12 +28,12 @@ const State = (function(){
       "1st.png","2nd.png","3rd.png","4th.png","5th.png","6th.png","7th.png","8th.png","9th.png","10th.png","alpha.png","beta.png","gamma.png","delta.png","epsilon.png","zeta.png","thaumiel_zeta.png","eta.png","theta.png","iota.png","kappa.png"
     ],
     rip: [
-      "RIP_Alpha_low.png","RIP_Alpha.png","RIP_Alpha_high.png",
-      "RIP_Beta_low.png","RIP_Beta.png","RIP_Beta_high.png",
-      "RIP_Gamma_low.png","RIP_Gamma.png","RIP_Gamma_high.png",
-      "RIP_Delta_low.png","RIP_Delta.png","RIP_Delta_high.png","RIP_Delta_doubleplus.png",
-      "RIP_Epsilon_low.png","RIP_Epsilon.png",
-      "RIP_Zeta_low.png","RIP_Zeta.png","RIP_Zeta_high.png",
+      "rip_alpha_low.png","rip_alpha.png","rip_alpha_high.png",
+      "rip_beta_low.png","rip_beta.png","rip_beta_high.png",
+      "rip_gamma_low.png","rip_gamma.png","rip_gamma_high.png",
+      "rip_delta_low.png","rip_delta.png","rip_delta_high.png","rip_delta_doubleplus.png",
+      "rip_epsilon_low.png","rip_epsilon.png",
+      "rip_zeta_low.png","rip_zeta.png","rip_zeta_high.png",
       "RIP_Kappa_low.png", "RIP_Kappa_high.png"
     ]
   };

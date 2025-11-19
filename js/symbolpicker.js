@@ -85,7 +85,6 @@
     closeModal();
     updateSelectedPreview();
     Render.render();
-    updateSelectedLabel();
   }
 
   function selectCustomSymbol(g){
@@ -95,7 +94,6 @@
     closeModal();
     updateSelectedPreview();
     Render.render();
-    updateSelectedLabel();
   }
 
   function updateSelectedPreview(){

@@ -44,10 +44,6 @@
       Render.render();
     }));
 
-    advToggle.addEventListener('change', (e)=>{
-      document.getElementById('advancedControls').style.display = e.target.checked ? 'block' : 'none';
-    });
-
     // numeric inputs editable
     ['zoomVal','scaleXVal','scaleYVal','rotateVal'].forEach(id=>{
       const el = document.getElementById(id);
