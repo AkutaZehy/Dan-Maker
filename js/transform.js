@@ -20,21 +20,49 @@
 
     [zoom, scaleX, scaleY, rotate].forEach(el=> el.addEventListener('input', ()=>{
       const target = document.getElementById('editTargetSelect').value;
+      const isAdvanced = document.getElementById('advToggle').checked;
+      
+      // When advanced is OFF, sync scaleX/Y with zoom
+      if(!isAdvanced && el === zoom){
+        scaleX.value = zoom.value;
+        scaleY.value = zoom.value;
+      }
+      
       if(target === 'symbol'){
-        // symbol uses its own symbolZoom slider; don't apply zoom here
+        // symbol now uses transform zoom instead of symbolZoom
+        if(!State.state.symbolMeta) State.state.symbolMeta = {zoom:100, scaleX:100, scaleY:100, rotate:0};
+        if(isAdvanced){
+          State.state.symbolMeta.scaleX = parseInt(scaleX.value,10);
+          State.state.symbolMeta.scaleY = parseInt(scaleY.value,10);
+        } else {
+          State.state.symbolMeta.zoom = parseInt(zoom.value,10);
+          State.state.symbolMeta.scaleX = parseInt(zoom.value,10);
+          State.state.symbolMeta.scaleY = parseInt(zoom.value,10);
+        }
+        State.state.symbolMeta.rotate = parseFloat(rotate.value) || 0;
       } else if(target === 'individual'){
-        State.state.indMeta.zoom = parseInt(zoom.value,10);
-        State.state.indMeta.scaleX = parseInt(scaleX.value,10);
-        State.state.indMeta.scaleY = parseInt(scaleY.value,10);
+        if(isAdvanced){
+          State.state.indMeta.scaleX = parseInt(scaleX.value,10);
+          State.state.indMeta.scaleY = parseInt(scaleY.value,10);
+        } else {
+          State.state.indMeta.zoom = parseInt(zoom.value,10);
+          State.state.indMeta.scaleX = parseInt(zoom.value,10);
+          State.state.indMeta.scaleY = parseInt(zoom.value,10);
+        }
         State.state.indMeta.rotate = parseFloat(rotate.value) || 0;
       } else if(target === 'marathon'){
         const sel = document.getElementById('editTargetSelect').dataset.slotIndex;
         if(sel){
           const assigned = State.state.marImages.find(m=>m.slot === parseInt(sel,10));
           if(assigned){
-            assigned.meta.zoom = parseInt(zoom.value,10);
-            assigned.meta.scaleX = parseInt(scaleX.value,10);
-            assigned.meta.scaleY = parseInt(scaleY.value,10);
+            if(isAdvanced){
+              assigned.meta.scaleX = parseInt(scaleX.value,10);
+              assigned.meta.scaleY = parseInt(scaleY.value,10);
+            } else {
+              assigned.meta.zoom = parseInt(zoom.value,10);
+              assigned.meta.scaleX = parseInt(zoom.value,10);
+              assigned.meta.scaleY = parseInt(zoom.value,10);
+            }
             assigned.meta.rotate = parseFloat(rotate.value) || 0;
           }
         }

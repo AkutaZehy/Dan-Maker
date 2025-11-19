@@ -9,6 +9,7 @@ const State = (function(){
     mode: 'individual',
     indBg: null,
     indMeta: { zoom:100, scaleX:100, scaleY:100, rotate:0, offsetX:0, offsetY:0 },
+    symbolMeta: { zoom:100, scaleX:100, scaleY:100, rotate:0 },
     marImages: [], // {id,img,name,slot:null,offsetX:0,meta:{zoom:100,scaleX:100,scaleY:100,rotate:0}}
     marBorderImg: null,
     marBorderMode: 'reform',
@@ -20,6 +21,7 @@ const State = (function(){
     applyBorderTint: true,
     applySymbolTint: true,
     showSymbol: true,
+    glitchSeed: 0,
     SLOTS
   };
 

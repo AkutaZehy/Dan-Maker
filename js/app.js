@@ -35,13 +35,7 @@
   }
   updateUIForMode();
 
-  // symbol UI
-  document.getElementById('symbolZoom').addEventListener('input', (e)=>{
-    document.getElementById('symbolZoomVal').value = e.target.value;
-    Render.render();
-  });
-  document.getElementById('symbolZoomVal').addEventListener('change', (e)=>{ document.getElementById('symbolZoom').value = e.target.value; Render.render(); });
-
+  // symbol color UI
   ['sR','sG','sB'].forEach(id=>{
     const el = document.getElementById(id);
     el.addEventListener('input', ()=>{
@@ -104,7 +98,7 @@
     const sidx = State.state.selGreekIndex;
     if(sidx >= 0 && State.state.greekList[sidx] && State.state.greekList[sidx].img){
       const sym = State.state.greekList[sidx].img;
-      const sizePerc = parseFloat(document.getElementById('symbolZoom').value) / 100;
+      const sizePerc = (State.state.symbolMeta.zoom || 100) / 100 * 0.36;
       const targetH = 1080 * sizePerc;
       const targetW = targetH * (sym.width / sym.height);
       const sx = (1920 - targetW)/2, sy = (1080 - targetH)/2;
@@ -216,10 +210,18 @@
         if(assigned) assigned.meta = {zoom:100,scaleX:100,scaleY:100,rotate:0};
       }
     } else {
-      // symbol resets are DOM controls only
-      document.getElementById('symbolZoom').value = 36;
-      document.getElementById('symbolZoomVal').value = 36;
+      // symbol reset
+      State.state.symbolMeta = {zoom:100, scaleX:100, scaleY:100, rotate:0};
     }
+    // reset UI controls
+    document.getElementById('zoom').value = 100;
+    document.getElementById('zoomVal').value = 100;
+    document.getElementById('editScaleX').value = 100;
+    document.getElementById('scaleXVal').value = 100;
+    document.getElementById('editScaleY').value = 100;
+    document.getElementById('scaleYVal').value = 100;
+    document.getElementById('editRotate').value = 0;
+    document.getElementById('rotateVal').value = 0;
     State.savePersistent();
     Render.render();
   });

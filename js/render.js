@@ -148,16 +148,11 @@ const Render = (function(){
       // symbol
       if(S.selGreekIndex >= 0 && S.greekList[S.selGreekIndex] && S.greekList[S.selGreekIndex].img){
         const sym = S.greekList[S.selGreekIndex].img;
-        const size = parseFloat(document.getElementById('symbolZoom').value) / 100 || 0.36;
+        const size = (S.symbolMeta.zoom || 100) / 100 * 0.36; // Scale down: 100% = 36% of screen
         const targetH = OUT_H * size;
         const targetW = targetH * (sym.width / sym.height);
         const x = (OUT_W - targetW)/2, y = (OUT_H - targetH)/2;
-        const meta = {
-          scaleX: parseFloat(document.getElementById('editScaleX').value)||100,
-          scaleY: parseFloat(document.getElementById('editScaleY').value)||100,
-          rotate: parseFloat(document.getElementById('editRotate').value)||0
-        };
-        drawSymbolWithTintTo(offCtx, sym, x, y, targetW, targetH, S.symbolTint, S.applySymbolTint, meta, S.showSymbol);
+        drawSymbolWithTintTo(offCtx, sym, x, y, targetW, targetH, S.symbolTint, S.applySymbolTint, S.symbolMeta, S.showSymbol);
       }
     } else {
       // marathon mode
@@ -173,16 +168,11 @@ const Render = (function(){
       if(S.marBorderImg) drawBorderWithTintTo(offCtx, S.marBorderImg, S.borderTint, S.applyBorderTint);
       if(S.selGreekIndex >= 0 && S.greekList[S.selGreekIndex] && S.greekList[S.selGreekIndex].img){
         const sym = S.greekList[S.selGreekIndex].img;
-        const size = parseFloat(document.getElementById('symbolZoom').value) / 100 || 0.42;
+        const size = (S.symbolMeta.zoom || 100) / 100 * 0.42; // Scale down: 100% = 42% of screen (marathon mode slightly larger)
         const targetH = OUT_H * size;
         const targetW = targetH * (sym.width / sym.height);
         const x = (OUT_W - targetW)/2, y = (OUT_H - targetH)/2;
-        const meta = {
-          scaleX: parseFloat(document.getElementById('editScaleX').value)||100,
-          scaleY: parseFloat(document.getElementById('editScaleY').value)||100,
-          rotate: parseFloat(document.getElementById('editRotate').value)||0
-        };
-        drawSymbolWithTintTo(offCtx, sym, x, y, targetW, targetH, S.symbolTint, S.applySymbolTint, meta, S.showSymbol);
+        drawSymbolWithTintTo(offCtx, sym, x, y, targetW, targetH, S.symbolTint, S.applySymbolTint, S.symbolMeta, S.showSymbol);
       }
     }
   }

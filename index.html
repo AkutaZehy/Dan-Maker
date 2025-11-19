@@ -73,26 +73,16 @@
                 </div>
               </button>
               <div style="flex:1">
-                <div style="display:flex;gap:8px;align-items:center">
-                  <label class="mutedNote">Zoom</label>
-                  <div style="flex:1"><input id="symbolZoom" type="range" min="5" max="300" step="1" value="36"></div>
-                  <input id="symbolZoomVal" class="numInput" value="36" /> <div class="mutedNote">%</div>
+                <div class="mutedNote">Symbol color</div>
+                <div class="verticalColorSliders">
+                  <div>R <input id="sR" type="range" min="0" max="255" value="255"> <input id="sRval" class="numInput" value="255"></div>
+                  <div>G <input id="sG" type="range" min="0" max="255" value="255"> <input id="sGval" class="numInput" value="255"></div>
+                  <div>B <input id="sB" type="range" min="0" max="255" value="255"> <input id="sBval" class="numInput" value="255"></div>
                 </div>
-
-                <div style="display:flex;gap:8px;align-items:start;margin-top:8px">
-                  <div style="flex:1">
-                    <div class="mutedNote">Symbol color</div>
-                    <div class="verticalColorSliders">
-                      <div>R <input id="sR" type="range" min="0" max="255" value="255"> <input id="sRval" class="numInput" value="255"></div>
-                      <div>G <input id="sG" type="range" min="0" max="255" value="255"> <input id="sGval" class="numInput" value="255"></div>
-                      <div>B <input id="sB" type="range" min="0" max="255" value="255"> <input id="sBval" class="numInput" value="255"></div>
-                    </div>
-                  </div>
-                  <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-                    <div id="symbolColorPreview" class="bigColorPreview" title="Symbol color preview"></div>
-                    <button id="toggleSymbolEye" class="smallBtn">👁</button>
-                  </div>
-                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                <div id="symbolColorPreview" class="bigColorPreview" title="Symbol color preview"></div>
+                <button id="toggleSymbolEye" class="smallBtn">👁</button>
               </div>
             </div>
 
@@ -167,7 +157,6 @@
 
               <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
                 <label><input id="shadersOnlyBG" type="checkbox"> Apply only to Background</label>
-                <label><input id="shadersWhole" type="checkbox"> Apply to Whole image</label>
               </div>
             </div>
           </div>
