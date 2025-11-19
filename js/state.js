@@ -25,7 +25,7 @@ const State = (function(){
 
   const defaultGreek = {
     reform: [
-      "alpha.png","beta.png","gamma.png","delta.png","epsilon.png","zeta.png","thaumiel_zeta.png","eta.png","theta.png","iota.png","kappa.png"
+      "1st.png","2nd.png","3rd.png","4th.png","5th.png","6th.png","7th.png","8th.png","9th.png","10th.png","alpha.png","beta.png","gamma.png","delta.png","epsilon.png","zeta.png","thaumiel_zeta.png","eta.png","theta.png","iota.png","kappa.png"
     ],
     rip: [
       "RIP_Alpha_low.png","RIP_Alpha.png","RIP_Alpha_high.png",
@@ -33,7 +33,8 @@ const State = (function(){
       "RIP_Gamma_low.png","RIP_Gamma.png","RIP_Gamma_high.png",
       "RIP_Delta_low.png","RIP_Delta.png","RIP_Delta_high.png","RIP_Delta_doubleplus.png",
       "RIP_Epsilon_low.png","RIP_Epsilon.png",
-      "RIP_Zeta_low.png","RIP_Zeta.png","RIP_Zeta_high.png"
+      "RIP_Zeta_low.png","RIP_Zeta.png","RIP_Zeta_high.png",
+      "RIP_Kappa_low.png", "RIP_Kappa_high.png"
     ]
   };
 
