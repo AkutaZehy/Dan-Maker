@@ -27,7 +27,7 @@ const State = (function(){
 
   const defaultGreek = {
     reform: [
-      "1st.png","2nd.png","3rd.png","4th.png","5th.png","6th.png","7th.png","8th.png","9th.png","10th.png","alpha.png","beta.png","gamma.png","delta.png","epsilon.png","zeta.png","thaumiel_zeta.png","eta.png","theta.png","iota.png","kappa.png"
+      "1st.png","2nd.png","3rd.png","4th.png","5th.png","6th.png","7th.png","8th.png","9th.png","10th.png","alpha.png","alpha-jack.png","Alpha-tech.png","alpha-speed.png","alpha-stamina.png","beta.png","beta-jack.png","beta-tech.png","beta-speed.png","beta-stamina.png","gamma.png","gamma-glitch.png","gamma-jack.png","Gamma-tech.png","gamma-tech2.png","gamma-speed.png","gamma-stamina.png","gamma-missing.png","gamma-missing2.png","delta.png","delta-p.png","delta-sample.png","epsilon.png","epsilon-sample.png","zeta.png","thaumiel_zeta.png","eta.png","theta.png","iota.png","kappa.png"
     ],
     rip: [
       "rip_alpha_low.png","rip_alpha.png","rip_alpha_high.png",
@@ -36,7 +36,7 @@ const State = (function(){
       "rip_delta_low.png","rip_delta.png","rip_delta_high.png","rip_delta_doubleplus.png",
       "rip_epsilon_low.png","rip_epsilon.png",
       "rip_zeta_low.png","rip_zeta.png","rip_zeta_high.png",
-      "RIP_Kappa_low.png", "RIP_Kappa_high.png"
+      "RIP_Kappa_low.png", "RIP_Kappa_high.png", "RIP_Eta.png", "Iota-jkzee.png"
     ]
   };
 
