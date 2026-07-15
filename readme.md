@@ -1,6 +1,6 @@
 # Dan Maker Editor
 
-弹幕段位图排版合成工具。支持 Individual（单图）和 Marathon（四槽位）两种模式。
+段位图排版合成工具。支持 Individual（单图）和 Marathon（四槽位）两种模式。
 
 ## 功能
 
