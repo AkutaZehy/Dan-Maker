@@ -34,7 +34,7 @@
         const assigned = S.marImages.find(m=>m.slot === (found.index+1));
         if(assigned){
           dragging = true;
-          dragInfo = { type:'slot', slotIndex: found.index, startX: pos.x, startOffset: assigned.offsetX || 0 };
+          dragInfo = { type:'slot', slotIndex: found.index, startX: pos.x, startY: pos.y, startOffsetX: assigned.offsetX || 0, startOffsetY: assigned.offsetY || 0 };
           canvas.setPointerCapture(ev.pointerId);
           return;
         }
@@ -57,12 +57,15 @@
     const pos = getCanvasPos(ev);
     if(dragInfo.type === 'slot'){
       const dx = pos.x - dragInfo.startX;
+      const dy = pos.y - dragInfo.startY;
       const sensitivity = 0.22;
       const slot = State.state.SLOTS[State.state.marBorderMode][dragInfo.slotIndex];
-      let delta = dx / slot.w * 2 * sensitivity;
+      const deltaX = dx / slot.w * 2 * sensitivity;
+      const deltaY = dy / slot.h * 2 * sensitivity;
       const assigned = State.state.marImages.find(m=>m.slot === (dragInfo.slotIndex+1));
       if(assigned){
-        assigned.offsetX = Utils.clamp(dragInfo.startOffset + delta, -1, 1);
+        assigned.offsetX = Utils.clamp(dragInfo.startOffsetX + deltaX, -1, 1);
+        assigned.offsetY = Utils.clamp(dragInfo.startOffsetY + deltaY, -1, 1);
         Render.render();
       }
     } else if(dragInfo.type === 'bg'){

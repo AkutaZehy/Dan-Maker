@@ -25,19 +25,32 @@
 
   function updateUIForMode(){
     const isInd = State.state.mode === 'individual';
-    document.getElementById('borderPanel').style.display = isInd ? 'none' : 'block';
-    document.getElementById('marListWrap').style.display = isInd ? 'none' : 'block';
-    if(isInd){
-      document.getElementById('editTargetSelect').querySelectorAll('option').forEach(o=>{ if(o.value==='marathon') o.disabled=true; if(o.value==='individual') o.disabled=false; });
-    } else {
-      document.getElementById('editTargetSelect').querySelectorAll('option').forEach(o=>{ if(o.value==='marathon') o.disabled=false; if(o.value==='individual') o.disabled=true; });
-    }
+    const marPanel = document.getElementById('marathonPanel');
+    const indPanel = document.getElementById('individualPanel');
+    if(marPanel) marPanel.style.display = isInd ? 'none' : 'block';
+    if(indPanel) indPanel.style.display = isInd ? 'block' : 'none';
   }
   updateUIForMode();
+
+  // init symbol color preview + glob offset from state
+  (function initStateUI(){
+    const t = State.state.textOverlay;
+    const g = document.getElementById('globOffset');
+    const gv = document.getElementById('globOffsetVal');
+    if(g){ g.value = t.symOffset || 0; if(gv) gv.value = t.symOffset || 0; }
+  })();
+  (function initColorPreview(){
+    const t = State.state.symbolTint;
+    document.getElementById('sR').value = t.r; document.getElementById('sRval').value = t.r;
+    document.getElementById('sG').value = t.g; document.getElementById('sGval').value = t.g;
+    document.getElementById('sB').value = t.b; document.getElementById('sBval').value = t.b;
+    document.getElementById('symbolColorPreview').style.background = `rgb(${t.r},${t.g},${t.b})`;
+  })();
 
   // symbol color UI
   ['sR','sG','sB'].forEach(id=>{
     const el = document.getElementById(id);
+    if(!el) return;
     el.addEventListener('input', ()=>{
       State.state.symbolTint = { r: parseInt(document.getElementById('sR').value,10), g: parseInt(document.getElementById('sG').value,10), b: parseInt(document.getElementById('sB').value,10) };
       document.getElementById('sRval').value = document.getElementById('sR').value;
@@ -55,22 +68,12 @@
     Render.render();
   });
 
-  // editing target dropdown behavior
-  document.getElementById('editTargetSelect').addEventListener('change', ()=>{
-    const v = document.getElementById('editTargetSelect').value;
-    if(v === 'marathon'){ document.getElementById('selectedLabel').textContent = 'Selected: Marathon (click a slot)'; }
-    else if(v === 'individual'){ document.getElementById('selectedLabel').textContent = 'Selected: Individual background'; }
-    else { document.getElementById('selectedLabel').textContent = 'Selected: Symbol'; }
-    // clear dataset slot index if needed
-    if(v !== 'marathon') document.getElementById('editTargetSelect').removeAttribute('data-slot-index');
-  });
-
   // canvas drop (limit marathon to 4)
   const canvas = Render.canvas;
-  function prevent(e){ e.preventDefault(); e.stopPropagation(); }
-  ['dragenter','dragover','dragleave','drop'].forEach(ev => { canvas.addEventListener(ev, prevent); });
-  canvas.addEventListener('drop', async (e)=>{
-    const files = Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
+  canvas.addEventListener('dragover', e => { e.preventDefault(); });
+  canvas.addEventListener('drop', async e => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
     if(files.length===0) return;
     if(State.state.mode === 'individual'){
       const img = await Utils.loadImageFromFile(files[0]);
@@ -89,69 +92,132 @@
     }
   });
 
-  // canvas click selection with alpha-test for symbol
+  // canvas click — selects slot in slot editor
   canvas.addEventListener('click', (e)=>{
     const rect = canvas.getBoundingClientRect();
     const mx = (e.clientX - rect.left) * (1920 / rect.width);
     const my = (e.clientY - rect.top) * (1080 / rect.height);
-    // symbol detection
-    const sidx = State.state.selGreekIndex;
-    if(sidx >= 0 && State.state.greekList[sidx] && State.state.greekList[sidx].img){
-      const sym = State.state.greekList[sidx].img;
-      const sizePerc = (State.state.symbolMeta.zoom || 100) / 100 * 0.36;
-      const targetH = 1080 * sizePerc;
-      const targetW = targetH * (sym.width / sym.height);
-      const sx = (1920 - targetW)/2, sy = (1080 - targetH)/2;
-      if(mx >= sx && mx <= sx + targetW && my >= sy && my <= sy + targetH){
-        const off = document.createElement('canvas'); off.width = Math.round(targetW); off.height = Math.round(targetH);
-        const oc = off.getContext('2d');
-        oc.drawImage(sym, 0, 0, off.width, off.height);
-        const px = Math.floor(mx - sx), py = Math.floor(my - sy);
-        if(px >=0 && px < off.width && py >=0 && py < off.height){
-          const d = oc.getImageData(px,py,1,1).data;
-          if(d[3] >= 12){
-            document.getElementById('editTargetSelect').value = 'symbol';
-            document.getElementById('editTargetSelect').removeAttribute('data-slot-index');
-            document.getElementById('selectedLabel').textContent = 'Selected: Symbol';
-            return;
-          }
-        }
-      }
-    }
 
-    if(State.state.mode === 'individual'){
-      document.getElementById('editTargetSelect').value = 'individual';
-      document.getElementById('editTargetSelect').removeAttribute('data-slot-index');
-      document.getElementById('selectedLabel').textContent = 'Selected: Individual background';
-      return;
-    } else {
-      // marathon slot detection
+    if(State.state.mode === 'marathon'){
       const slots = State.state.SLOTS[State.state.marBorderMode] || State.state.SLOTS.reform;
       for(let i=0;i<slots.length;i++){
         const s = slots[i];
         if(mx >= s.x && mx <= s.x + s.w && my >= s.y && my <= s.y + s.h){
-          document.getElementById('editTargetSelect').value = 'marathon';
-          document.getElementById('editTargetSelect').dataset.slotIndex = (i+1);
-          document.getElementById('selectedLabel').textContent = 'Selected: Marathon (Slot ' + (i+1) + ')';
+          const sel = document.getElementById('slotTargetSelect');
+          if(sel) { sel.value = String(i+1); sel.dispatchEvent(new Event('change')); }
           return;
         }
       }
     }
-    document.getElementById('editTargetSelect').value = 'symbol';
-    document.getElementById('editTargetSelect').removeAttribute('data-slot-index');
-    document.getElementById('selectedLabel').textContent = 'Selected: Symbol';
+  });
+
+  // ── Slot Editor (right panel) ──
+  const slotTarget = document.getElementById('slotTargetSelect');
+  const slotName = document.getElementById('slotAssignedName');
+  const slotCtrls = document.getElementById('slotControls');
+  const slotFlipH = document.getElementById('slotFlipH');
+  const slotFlipV = document.getElementById('slotFlipV');
+  const slotXOff = document.getElementById('slotXOffset');
+  const slotXOffVal = document.getElementById('slotXOffsetVal');
+  const slotVOff = document.getElementById('slotVOffset');
+  const slotVOffVal = document.getElementById('slotVOffsetVal');
+  const slotScale = document.getElementById('slotScale');
+  const slotScaleVal = document.getElementById('slotScaleVal');
+
+  function getAssigned(){
+    const v = parseInt(slotTarget.value,10);
+    if(!v) return null;
+    return State.state.marImages.find(m=>m.slot === v);
+  }
+
+  function syncSlotUI(){
+    const a = getAssigned();
+    if(!a){
+      slotName.textContent = 'No image assigned';
+      slotCtrls.style.display = 'none';
+      return;
+    }
+    slotName.textContent = a.name || 'Image #' + slotTarget.value;
+    slotCtrls.style.display = 'block';
+    // flip
+    slotFlipH.dataset.active = a.meta.flipH ? 'true' : 'false';
+    slotFlipV.dataset.active = a.meta.flipV ? 'true' : 'false';
+    // offsets
+    const ox = Math.round((a.offsetX || 0) * 100);
+    slotXOff.value = ox; if(slotXOffVal) slotXOffVal.value = ox;
+    const oy = Math.round((a.offsetY || 0) * 100);
+    slotVOff.value = oy; if(slotVOffVal) slotVOffVal.value = oy;
+    // scale
+    const sc = a.meta.zoom || 100;
+    slotScale.value = sc; if(slotScaleVal) slotScaleVal.value = sc;
+  }
+
+  function onChangeSlot(){ Render.render(); State.savePersistent(); }
+
+  if(slotTarget) slotTarget.addEventListener('change', syncSlotUI);
+
+  // flip
+  if(slotFlipH) slotFlipH.addEventListener('click', ()=>{
+    const a = getAssigned(); if(!a) return;
+    a.meta.flipH = !a.meta.flipH;
+    slotFlipH.dataset.active = a.meta.flipH ? 'true' : 'false';
+    onChangeSlot();
+  });
+  if(slotFlipV) slotFlipV.addEventListener('click', ()=>{
+    const a = getAssigned(); if(!a) return;
+    a.meta.flipV = !a.meta.flipV;
+    slotFlipV.dataset.active = a.meta.flipV ? 'true' : 'false';
+    onChangeSlot();
+  });
+
+  // X.Offset
+  if(slotXOff) slotXOff.addEventListener('input', ()=>{
+    const a = getAssigned(); if(!a) return;
+    a.offsetX = parseFloat(slotXOff.value) / 100;
+    if(slotXOffVal) slotXOffVal.value = slotXOff.value;
+    onChangeSlot();
+  });
+  if(slotXOffVal) slotXOffVal.addEventListener('change', ()=>{
+    const v = Utils.clamp(parseFloat(slotXOffVal.value)||0, -100, 100);
+    slotXOffVal.value = v; slotXOff.value = v; slotXOff.dispatchEvent(new Event('input'));
+  });
+
+  // V.Offset
+  if(slotVOff) slotVOff.addEventListener('input', ()=>{
+    const a = getAssigned(); if(!a) return;
+    a.offsetY = parseFloat(slotVOff.value) / 100;
+    if(slotVOffVal) slotVOffVal.value = slotVOff.value;
+    onChangeSlot();
+  });
+  if(slotVOffVal) slotVOffVal.addEventListener('change', ()=>{
+    const v = Utils.clamp(parseFloat(slotVOffVal.value)||0, -100, 100);
+    slotVOffVal.value = v; slotVOff.value = v; slotVOff.dispatchEvent(new Event('input'));
+  });
+
+  // Scale
+  if(slotScale) slotScale.addEventListener('input', ()=>{
+    const a = getAssigned(); if(!a) return;
+    const val = parseInt(slotScale.value,10);
+    a.meta.zoom = val; a.meta.scaleX = val; a.meta.scaleY = val;
+    if(slotScaleVal) slotScaleVal.value = val;
+    onChangeSlot();
+  });
+  if(slotScaleVal) slotScaleVal.addEventListener('change', ()=>{
+    const v = Utils.clamp(parseFloat(slotScaleVal.value)||100, 50, 200);
+    slotScaleVal.value = v; slotScale.value = v; slotScale.dispatchEvent(new Event('input'));
   });
 
   // marathon list & assignment
-  const marList = document.getElementById('marList');
   function refreshMarList(){
-    marList.innerHTML = '';
+    const container = document.querySelector('.marListCompact');
+    if(!container) return;
+    container.innerHTML = '';
     const arr = [...State.state.marImages].sort((a,b)=> (a.slot||999) - (b.slot||999));
     arr.forEach(it=>{
       const item = document.createElement('div'); item.className='marItem';
       const img = document.createElement('img'); img.src = it.img.src;
-      const controls = document.createElement('div'); controls.style.display='flex'; controls.style.flexDirection='column';
-      const sel = document.createElement('select'); sel.className='slotSelect';
+      const controls = document.createElement('div'); controls.style.display='flex'; controls.style.flexDirection='column'; controls.style.gap='2px';
+      const sel = document.createElement('select'); sel.className='slotSelect'; sel.style.fontSize='11px'; sel.style.padding='2px 4px';
       const none = document.createElement('option'); none.value='none'; none.textContent='(no slot)'; sel.appendChild(none);
       for(let s=1;s<=4;s++){ const o=document.createElement('option'); o.value=s; o.textContent='Slot '+s; sel.appendChild(o); }
       sel.value = it.slot ? String(it.slot) : 'none';
@@ -159,69 +225,86 @@
         const chosen = sel.value === 'none' ? null : parseInt(sel.value,10);
         assignSlot(it.id, chosen);
       });
-      const rem = document.createElement('button'); rem.className='smallBtn'; rem.textContent='✕';
+      const rem = document.createElement('button'); rem.className='smallBtn'; rem.textContent='✕'; rem.style.padding='2px 6px'; rem.style.fontSize='11px';
       rem.addEventListener('click', ()=>{
         State.state.marImages = State.state.marImages.filter(m=>m.id !== it.id);
-        refreshMarList(); Render.render(); State.savePersistent();
+        refreshMarList(); Render.render(); State.savePersistent(); syncSlotUI();
       });
       controls.appendChild(sel); controls.appendChild(rem);
       item.appendChild(img); item.appendChild(controls);
       // clicking thumbnail selects slot
       img.addEventListener('click', ()=>{
-        if(it.slot) {
-          document.getElementById('editTargetSelect').value = 'marathon';
-          document.getElementById('editTargetSelect').dataset.slotIndex = it.slot;
-          document.getElementById('selectedLabel').textContent = 'Selected: Marathon (Slot ' + it.slot + ')';
+        if(it.slot && slotTarget) {
+          slotTarget.value = String(it.slot);
+          slotTarget.dispatchEvent(new Event('change'));
         }
       });
-      marList.appendChild(item);
+      container.appendChild(item);
     });
   }
   function assignSlot(id,slot){
     const target = State.findMarById(id);
     if(!target) return;
-    if(slot === null){ target.slot = null; refreshMarList(); Render.render(); State.savePersistent(); return; }
+    if(slot === null){ target.slot = null; refreshMarList(); Render.render(); State.savePersistent(); syncSlotUI(); return; }
     const occupant = State.state.marImages.find(m=>m.slot === slot);
     if(occupant && occupant.id !== target.id){
       occupant.slot = target.slot; target.slot = slot;
     } else target.slot = slot;
-    refreshMarList(); Render.render(); State.savePersistent();
+    refreshMarList(); Render.render(); State.savePersistent(); syncSlotUI();
   }
 
   // slot snap button
   document.getElementById('snapSlots').addEventListener('click', ()=>{
-    // reassign slots in order of marImages array top to bottom
     const imgs = State.state.marImages;
     for(let i=0;i<imgs.length;i++){
       imgs[i].slot = i+1;
     }
-    refreshMarList(); Render.render(); State.savePersistent();
+    refreshMarList(); Render.render(); State.savePersistent(); syncSlotUI();
   });
 
-  // reset transform button resets for current target
-  document.getElementById('resetTransform').addEventListener('click', ()=>{
-    const target = document.getElementById('editTargetSelect').value;
-    if(target === 'individual'){
-      State.state.indMeta = { zoom:100, scaleX:100, scaleY:100, rotate:0, offsetX:0, offsetY:0 };
-    } else if(target === 'marathon'){
-      const slot = document.getElementById('editTargetSelect').dataset.slotIndex;
-      if(slot){
-        const assigned = State.state.marImages.find(m=>m.slot === parseInt(slot,10));
-        if(assigned) assigned.meta = {zoom:100,scaleX:100,scaleY:100,rotate:0};
-      }
-    } else {
-      // symbol reset
-      State.state.symbolMeta = {zoom:100, scaleX:100, scaleY:100, rotate:0};
-    }
-    // reset UI controls
-    document.getElementById('zoom').value = 100;
-    document.getElementById('zoomVal').value = 100;
-    document.getElementById('editScaleX').value = 100;
-    document.getElementById('scaleXVal').value = 100;
-    document.getElementById('editScaleY').value = 100;
-    document.getElementById('scaleYVal').value = 100;
-    document.getElementById('editRotate').value = 0;
-    document.getElementById('rotateVal').value = 0;
+  // slot reset — resets currently selected slot's image transform
+  document.getElementById('slotReset').addEventListener('click', ()=>{
+    const a = getAssigned();
+    if(!a) return;
+    a.offsetX = 0; a.offsetY = 0;
+    a.meta = {zoom:100, scaleX:100, scaleY:100, rotate:0, flipH:false, flipV:false};
+    syncSlotUI();
+    State.savePersistent();
+    Render.render();
+  });
+
+  // Glob.V slider — adjusts symbol vertical offset
+  const globOff = document.getElementById('globOffset');
+  const globOffVal = document.getElementById('globOffsetVal');
+  if(globOff){
+    globOff.addEventListener('input', ()=>{
+      State.state.textOverlay.symOffset = parseInt(globOff.value,10);
+      if(globOffVal) globOffVal.value = globOff.value;
+      State.savePersistent();
+      Render.render();
+    });
+  }
+  if(globOffVal){
+    globOffVal.addEventListener('change', ()=>{
+      const v = Utils.clamp(parseInt(globOffVal.value,10)||0, -200, 200);
+      globOffVal.value = v; globOff.value = v; globOff.dispatchEvent(new Event('input'));
+    });
+  }
+
+  // Reset Values — reset sliders + flip only, not text/checkboxes/slots
+  document.getElementById('resetAllBtn').addEventListener('click', ()=>{
+    State.state.symbolMeta = {zoom:100, scaleX:100, scaleY:100, rotate:0, flipH:false, flipV:false};
+    State.state.textOverlay.symOffset = 0;
+    State.state.textOverlay.textOffset = 0;
+    State.state.textOverlay.scale = 100;
+    // reset slider UI
+    document.getElementById('zoom').value = 100; document.getElementById('zoomVal').value = 100;
+    document.getElementById('editScaleX').value = 100; document.getElementById('scaleXVal').value = 100;
+    document.getElementById('editScaleY').value = 100; document.getElementById('scaleYVal').value = 100;
+    document.getElementById('editRotate').value = 0; document.getElementById('rotateVal').value = 0;
+    if(globOff){ globOff.value = 0; globOffVal.value = 0; }
+    const fh = document.getElementById('flipHBtn'); if(fh) fh.dataset.active = 'false';
+    const fv = document.getElementById('flipVBtn'); if(fv) fv.dataset.active = 'false';
     State.savePersistent();
     Render.render();
   });
@@ -243,7 +326,6 @@
   });
   cancelExport.addEventListener('click', ()=> { exportOverlay.style.display='none'; exportModal.style.display='none'; });
   exportBtn.addEventListener('click', ()=>{
-    // compute size
     const radios = Array.from(exportModal.querySelectorAll('input[name="sizeOpt"]'));
     let chosen = radios.find(r=>r.checked).value;
     const [wstr,hstr] = chosen.split('x');
@@ -251,7 +333,6 @@
     const customW = parseInt(document.getElementById('customW').value,10);
     const customH = parseInt(document.getElementById('customH').value,10);
     if(customW && customH) { W = customW; H = customH; }
-    // render at size
     const out = Render.renderAtSize(W,H);
     out.toBlob(blob=>{
       const a = document.createElement('a');
@@ -266,7 +347,6 @@
   refreshMarList();
   Render.render();
 
-  // debounce render on interval for interactive feel
   const deb = Utils.debounce(()=> Render.render(), 50);
   setInterval(deb, 150);
 })();

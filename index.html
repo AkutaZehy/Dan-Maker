@@ -16,14 +16,176 @@
     </header>
 
     <main class="grid">
-      <!-- LEFT (minimal) -->
+      <!-- LEFT: Symbols + Text + Transform + Shaders -->
       <aside class="left panel">
-        <div class="panel-section">
-          <div class="section-title">Actions</div>
-          <div style="display:flex;gap:8px;flex-direction:column">
-            <button id="downloadBtn" class="btn">Download PNG</button>
-            <button id="exportPreset" class="smallBtn">Export Preset</button>
+        <div class="scrollArea">
+
+          <!-- Actions -->
+          <div class="panel-section">
+            <div class="section-title">Actions</div>
+            <div style="display:flex;gap:8px;flex-direction:column">
+              <button id="downloadBtn" class="btn">Download PNG</button>
+              <button id="exportPreset" class="smallBtn">Export Preset</button>
+            </div>
           </div>
+
+          <!-- Symbols (Greek + Text Symbol + Transform all in one) -->
+          <div class="panel-section section-spacer">
+            <div class="section-title">Symbols</div>
+
+            <!-- Greek picker (hidden when text symbol is enabled) -->
+            <div id="greekSection">
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+                <button id="openSymbolPicker" class="iconGridBtn" title="Open symbol picker">
+                  <div class="gridIcon"><div class="gcell">α</div><div class="gcell">β</div><div class="gcell">γ</div><div class="gcell">δ</div></div>
+                </button>
+                <div style="flex:1">
+                  <div class="mutedNote" style="margin-bottom:2px">Symbol color</div>
+                  <div class="verticalColorSliders" style="gap:3px">
+                    <div style="display:flex;align-items:center;gap:4px"><span style="min-width:10px;font-size:11px;color:var(--muted)">R</span><input id="sR" type="range" min="0" max="255" value="255" style="flex:1;height:16px"><input id="sRval" class="numInput" style="width:40px;padding:3px 4px" value="255"></div>
+                    <div style="display:flex;align-items:center;gap:4px"><span style="min-width:10px;font-size:11px;color:var(--muted)">G</span><input id="sG" type="range" min="0" max="255" value="255" style="flex:1;height:16px"><input id="sGval" class="numInput" style="width:40px;padding:3px 4px" value="255"></div>
+                    <div style="display:flex;align-items:center;gap:4px"><span style="min-width:10px;font-size:11px;color:var(--muted)">B</span><input id="sB" type="range" min="0" max="255" value="255" style="flex:1;height:16px"><input id="sBval" class="numInput" style="width:40px;padding:3px 4px" value="255"></div>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                  <div id="symbolColorPreview" class="bigColorPreview" style="width:40px;height:32px" title="Symbol color preview"></div>
+                  <button id="toggleSymbolEye" class="smallBtn" style="padding:2px 8px;font-size:13px">👁</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Text Symbol -->
+            <label style="font-size:12px;display:flex;align-items:center;gap:6px;margin-top:4px">
+              <input id="tsEnabled" type="checkbox"> Use text as symbol
+            </label>
+            <div id="tsControls" style="display:none;margin-top:6px">
+              <input id="tsInput" type="text" placeholder="Type symbol text..." style="width:100%;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.25);color:var(--white);box-sizing:border-box;font-size:13px">
+              <select id="tsFont" class="slotSelect" style="width:100%;padding:4px;margin-top:4px">
+                <option value="EB Garamond">EB Garamond</option>
+                <option value="Source Han Serif CN">思源宋体</option>
+              </select>
+              <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+                <span class="mutedNote" style="min-width:28px;font-size:11px">Size</span>
+                <input id="tsSize" type="range" min="24" max="300" step="1" value="72" style="flex:1;height:16px">
+                <input id="tsSizeVal" class="numInput" style="width:36px;padding:3px 4px" value="72">
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+                <span class="mutedNote" style="min-width:28px;font-size:11px">Wt</span>
+                <input id="tsWeight" type="range" min="300" max="900" step="1" value="700" style="flex:1;height:16px">
+                <input id="tsWeightVal" class="numInput" style="width:36px;padding:3px 4px" value="700">
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                <span class="mutedNote" style="min-width:28px;font-size:11px">Color</span>
+                <input id="tsColor" type="color" value="#ffffff" style="width:32px;height:24px;border-radius:3px;border:0;background:transparent;cursor:pointer;padding:0">
+              </div>
+            </div>
+
+            <!-- Transform controls (always visible) -->
+            <div style="display:flex;gap:6px;margin-top:10px;margin-bottom:6px">
+              <button id="flipHBtn" class="smallBtn toggleBtn" data-active="false" style="flex:1;padding:4px 6px;font-size:12px">↔ Flip H</button>
+              <button id="flipVBtn" class="smallBtn toggleBtn" data-active="false" style="flex:1;padding:4px 6px;font-size:12px">↕ Flip V</button>
+            </div>
+            <div class="tr-row"><span class="tr-label" style="min-width:28px">Zoom</span><input id="zoom" type="range" min="10" max="400" step="1" value="100" class="tr-slider"><input id="zoomVal" class="numInput tr-input" value="100"><span class="mutedNote" style="font-size:11px">%</span></div>
+            <label style="margin-top:4px;display:block;font-size:11px"><input id="advToggle" type="checkbox"> Advanced (X/Y)</label>
+            <div id="advancedControls" style="display:none;margin-top:4px">
+              <div class="tr-row"><span class="tr-label" style="min-width:28px">ScX</span><input id="editScaleX" type="range" min="50" max="200" step="1" value="100" class="tr-slider"><input id="scaleXVal" class="numInput tr-input" value="100"><span class="mutedNote" style="font-size:11px">%</span></div>
+              <div class="tr-row" style="margin-top:4px"><span class="tr-label" style="min-width:28px">ScY</span><input id="editScaleY" type="range" min="50" max="200" step="1" value="100" class="tr-slider"><input id="scaleYVal" class="numInput tr-input" value="100"><span class="mutedNote" style="font-size:11px">%</span></div>
+            </div>
+            <div class="tr-row" style="margin-top:4px"><span class="tr-label" style="min-width:28px">Rot</span><input id="editRotate" type="range" min="-180" max="180" step="1" value="0" class="tr-slider"><input id="rotateVal" class="numInput tr-input" value="0"><span class="mutedNote" style="font-size:11px">°</span></div>
+          </div>
+
+          <!-- Subtitle (was Text Overlay) -->
+          <div class="panel-section section-spacer">
+            <div class="section-title">Subtitle</div>
+            <label style="font-size:12px;display:flex;align-items:center;gap:6px">
+              <input id="textEnabled" type="checkbox"> Enable
+            </label>
+            <div id="textControls" style="display:none;margin-top:6px">
+              <input id="textInput" type="text" placeholder="Enter subtitle text..." style="width:100%;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.25);color:var(--white);box-sizing:border-box;font-size:13px">
+
+              <div style="display:flex;gap:6px;margin-top:6px">
+                <select id="textFont" class="slotSelect" style="flex:1;padding:4px">
+                  <option value="EB Garamond">EB Garamond</option>
+                  <option value="Source Han Serif CN">思源宋体</option>
+                </select>
+                <select id="textLayout" class="slotSelect" style="flex:1;padding:4px">
+                  <option value="below">Below</option>
+                  <option value="above">Above</option>
+                  <option value="only">Text Only</option>
+                </select>
+              </div>
+
+              <div style="display:flex;gap:6px;align-items:center;margin-top:6px">
+                <span class="mutedNote" style="min-width:28px;font-size:11px">Size</span>
+                <input id="textSize" type="range" min="12" max="200" step="1" value="48" style="flex:1;height:16px">
+                <input id="textSizeVal" class="numInput" style="width:36px;padding:3px 4px" value="48">
+              </div>
+
+              <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+                <span class="mutedNote" style="min-width:28px;font-size:11px">Scale</span>
+                <input id="textScale" type="range" min="20" max="300" step="1" value="100" style="flex:1;height:16px">
+                <input id="textScaleVal" class="numInput" style="width:36px;padding:3px 4px" value="100"> <span class="mutedNote" style="font-size:11px">%</span>
+              </div>
+
+              <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+                <span class="mutedNote" style="min-width:28px;font-size:11px">Txt V</span>
+                <input id="textVOffset" type="range" min="-200" max="200" step="1" value="0" style="flex:1;height:16px">
+                <input id="textVOffsetVal" class="numInput" style="width:36px;padding:3px 4px" value="0">
+              </div>
+
+              <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+                <span class="mutedNote" style="min-width:28px;font-size:11px">Wt</span>
+                <input id="textWeight" type="range" min="300" max="900" step="1" value="400" style="flex:1;height:16px">
+                <input id="textWeightVal" class="numInput" style="width:36px;padding:3px 4px" value="400">
+              </div>
+
+              <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                <span class="mutedNote" style="min-width:28px;font-size:11px">Color</span>
+                <input id="textColor" type="color" value="#ffffff" style="width:32px;height:24px;border-radius:3px;border:0;background:transparent;cursor:pointer;padding:0">
+              </div>
+
+              <!-- Stroke -->
+              <div style="margin-top:6px;padding-top:4px;border-top:1px solid var(--border-subtle)">
+                <label style="font-size:12px"><input id="textStroke" type="checkbox"> Stroke</label>
+                <div id="textStrokeControls" style="display:none;margin-top:4px">
+                  <div style="display:flex;gap:6px;align-items:center">
+                    <input id="textStrokeColor" type="color" value="#000000" style="width:28px;height:22px;border-radius:3px;border:0;background:transparent;cursor:pointer;padding:0">
+                    <span class="mutedNote" style="font-size:11px">W</span>
+                    <input id="textStrokeWidth" type="range" min="1" max="10" step="1" value="2" style="flex:1;height:16px">
+                    <input id="textStrokeWidthVal" class="numInput" style="width:32px;padding:2px 3px" value="2">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Shadow -->
+              <div style="margin-top:6px;padding-top:4px;border-top:1px solid var(--border-subtle)">
+                <label style="font-size:12px"><input id="textShadow" type="checkbox"> Shadow</label>
+                <div id="textShadowControls" style="display:none;margin-top:4px">
+                  <div style="display:flex;gap:6px;align-items:center">
+                    <input id="textShadowColor" type="color" value="#000000" style="width:28px;height:22px;border-radius:3px;border:0;background:transparent;cursor:pointer;padding:0">
+                    <span class="mutedNote" style="font-size:11px">Blur</span>
+                    <input id="textShadowBlur" type="range" min="0" max="20" step="1" value="4" style="flex:1;height:16px">
+                    <input id="textShadowBlurVal" class="numInput" style="width:32px;padding:2px 3px" value="4">
+                  </div>
+                  <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+                    <span class="mutedNote" style="font-size:11px">X</span>
+                    <input id="textShadowX" type="range" min="-20" max="20" step="1" value="2" style="flex:1;height:16px">
+                    <input id="textShadowXVal" class="numInput" style="width:32px;padding:2px 3px" value="2">
+                    <span class="mutedNote" style="font-size:11px">Y</span>
+                    <input id="textShadowY" type="range" min="-20" max="20" step="1" value="2" style="flex:1;height:16px">
+                    <input id="textShadowYVal" class="numInput" style="width:32px;padding:2px 3px" value="2">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Global -->
+          <div class="panel-section section-spacer">
+            <div class="section-title">Global</div>
+            <div class="tr-row"><span class="tr-label" style="min-width:28px">Gl.V</span><input id="globOffset" type="range" min="-200" max="200" step="1" value="0" class="tr-slider"><input id="globOffsetVal" class="numInput tr-input" value="0"></div>
+          </div>
+
         </div>
       </aside>
 
@@ -42,17 +204,13 @@
             <div id="overlayContainer" class="overlayContainer" aria-hidden="true"></div>
           </div>
 
-          <div id="marListWrap" class="marListWrap">
-            <div id="marList" class="marList" aria-label="Marathon images"></div>
-          </div>
-
           <div id="tips" class="tips">
             <div class="mutedNote">Tip: Click symbol pixels (not transparent) to select symbol. Click slots or thumbnails to select marathon slot. Drag empty canvas area to pan background (when Individual background selected).</div>
           </div>
         </div>
       </section>
 
-      <!-- RIGHT -->
+      <!-- RIGHT: Mode + Slots + Border -->
       <aside class="right panel" id="rightPanel">
         <div class="scrollArea">
 
@@ -64,124 +222,116 @@
             <div id="modeToggle" class="segmented" style="margin-bottom:12px"></div>
           </div>
 
-          <div class="panel-section">
-            <div class="section-title">Symbols</div>
-            <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
-              <button id="openSymbolPicker" class="iconGridBtn" title="Open symbol picker">
-                <div class="gridIcon">
-                  <div class="gcell">α</div><div class="gcell">β</div><div class="gcell">γ</div><div class="gcell">δ</div>
-                </div>
-              </button>
-              <div style="flex:1">
-                <div class="mutedNote">Symbol color</div>
-                <div class="verticalColorSliders">
-                  <div>R <input id="sR" type="range" min="0" max="255" value="255"> <input id="sRval" class="numInput" value="255"></div>
-                  <div>G <input id="sG" type="range" min="0" max="255" value="255"> <input id="sGval" class="numInput" value="255"></div>
-                  <div>B <input id="sB" type="range" min="0" max="255" value="255"> <input id="sBval" class="numInput" value="255"></div>
-                </div>
+          <!-- Shaders (always visible) -->
+          <div class="panel-section section-spacer">
+            <div class="section-title">Shaders</div>
+            <label style="font-size:12px;display:flex;align-items:center;gap:6px"><input id="masterShaders" type="checkbox"> Enable</label>
+            <div id="shadersPanel" style="display:none;margin-top:6px">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+                <label style="font-size:11px;min-width:36px"><input id="chkGlitch" type="checkbox"> Glitch</label>
+                <input id="glitchIntensity" type="range" min="0" max="100" step="1" value="30" style="flex:1;height:16px">
+                <input id="glitchVal" class="numInput" style="width:32px;padding:2px 3px" value="30">
               </div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-                <div id="symbolColorPreview" class="bigColorPreview" title="Symbol color preview"></div>
-                <button id="toggleSymbolEye" class="smallBtn">👁</button>
+              <div style="margin-bottom:4px">
+                <button id="regenGlitch" class="smallBtn" style="width:100%;padding:3px;font-size:11px">Random</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+                <label style="font-size:11px;min-width:36px"><input id="chkRGB" type="checkbox"> RGB</label>
+                <input id="rgbIntensity" type="range" min="0" max="200" step="1" value="20" style="flex:1;height:16px">
+                <input id="rgbVal" class="numInput" style="width:32px;padding:2px 3px" value="20">
+              </div>
+              <label style="font-size:11px;display:flex;align-items:center;gap:4px"><input id="shadersOnlyBG" type="checkbox"> Only BG</label>
+            </div>
+          </div>
+
+          <!-- Marathon: Slots + Slot Editor -->
+          <div id="marathonPanel" style="display:none">
+            <div class="panel-section section-spacer">
+              <div class="section-title">Slots</div>
+              <div id="marList" class="marListCompact" aria-label="Marathon images"></div>
+              <div style="display:flex;gap:6px;margin-top:6px">
+                <button id="snapSlots" class="smallBtn" style="flex:1;padding:4px">Snap Slots</button>
               </div>
             </div>
 
-            <div style="margin-top:10px">
-              <div class="mutedNote">Editing target</div>
-              <select id="editTargetSelect" class="slotSelect" aria-label="Choose editing target">
-                <option value="symbol">Symbol</option>
-                <option value="individual">Individual background</option>
-                <option value="marathon">Marathon slot image</option>
+            <div class="panel-section section-spacer">
+              <div class="section-title">Slot Editor</div>
+              <div class="mutedNote" style="margin-bottom:4px;font-size:11px">Target</div>
+              <select id="slotTargetSelect" class="slotSelect" style="width:100%;padding:4px">
+                <option value="">(select a slot)</option>
+                <option value="1">Slot 1</option>
+                <option value="2">Slot 2</option>
+                <option value="3">Slot 3</option>
+                <option value="4">Slot 4</option>
               </select>
-              <div id="selectedLabel" class="mutedNote" style="margin-top:6px">Selected: None</div>
-            </div>
-          </div>
+              <div id="slotAssignedName" class="mutedNote" style="margin-top:4px;font-size:11px">No image assigned</div>
 
-          <div class="panel-section">
-            <div class="mutedNote">Transform (real-time)</div>
-            <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
-              <div style="flex:1">Zoom <input id="zoom" type="range" min="10" max="400" step="1" value="100"></div>
-              <input id="zoomVal" class="numInput" value="100" /> <div class="mutedNote">%</div>
-            </div>
-
-            <div style="margin-top:8px">
-              <label><input id="advToggle" type="checkbox"> Advanced (X/Y)</label>
-              <div id="advancedControls" style="display:none;margin-top:8px">
-                <div style="display:flex;gap:8px;align-items:center">
-                  <div style="flex:1">Scale X <input id="editScaleX" type="range" min="50" max="200" step="1" value="100"></div>
-                  <input id="scaleXVal" class="numInput" value="100" /> <div class="mutedNote">%</div>
+              <div id="slotControls" style="display:none;margin-top:6px">
+                <!-- Flip -->
+                <div style="display:flex;gap:6px;margin-bottom:6px">
+                  <button id="slotFlipH" class="smallBtn toggleBtn" data-active="false" style="flex:1;padding:3px 6px;font-size:11px">↔ Flip H</button>
+                  <button id="slotFlipV" class="smallBtn toggleBtn" data-active="false" style="flex:1;padding:3px 6px;font-size:11px">↕ Flip V</button>
                 </div>
-                <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
-                  <div style="flex:1">Scale Y <input id="editScaleY" type="range" min="50" max="200" step="1" value="100"></div>
-                  <input id="scaleYVal" class="numInput" value="100" /> <div class="mutedNote">%</div>
+
+                <!-- X.Offset -->
+                <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                  <span class="mutedNote" style="min-width:36px;font-size:11px">X.Off</span>
+                  <input id="slotXOffset" type="range" min="-100" max="100" step="1" value="0" style="flex:1;height:16px">
+                  <input id="slotXOffsetVal" class="numInput" style="width:36px;padding:3px 4px" value="0">
+                </div>
+
+                <!-- V.Offset -->
+                <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                  <span class="mutedNote" style="min-width:36px;font-size:11px">V.Off</span>
+                  <input id="slotVOffset" type="range" min="-100" max="100" step="1" value="0" style="flex:1;height:16px">
+                  <input id="slotVOffsetVal" class="numInput" style="width:36px;padding:3px 4px" value="0">
+                </div>
+
+                <!-- Scale -->
+                <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                  <span class="mutedNote" style="min-width:36px;font-size:11px">Scale</span>
+                  <input id="slotScale" type="range" min="50" max="200" step="1" value="100" style="flex:1;height:16px">
+                  <input id="slotScaleVal" class="numInput" style="width:36px;padding:3px 4px" value="100"> <span class="mutedNote" style="font-size:11px">%</span>
+                </div>
+
+                <!-- Reset -->
+                <div style="margin-top:6px;display:flex;gap:6px">
+                  <button id="slotReset" class="smallBtn" style="flex:1;padding:3px;font-size:11px">Reset Slot</button>
                 </div>
               </div>
             </div>
 
-            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-              <div style="flex:1">Rotate <input id="editRotate" type="range" min="-180" max="180" step="1" value="0"></div>
-              <input id="rotateVal" class="numInput" value="0" /> <div class="mutedNote">°</div>
-            </div>
-
-            <div style="margin-top:8px;display:flex;gap:8px">
-              <button id="resetTransform" class="smallBtn">Reset</button>
-              <button id="snapSlots" class="smallBtn">Snap slots</button>
-            </div>
-          </div>
-
-          <div class="panel-section">
-            <div class="mutedNote" style="display:flex;justify-content:space-between;align-items:center">
-              <div>Shaders</div>
-              <label style="font-size:12px"><input id="masterShaders" type="checkbox"> Enable</label>
-            </div>
-
-            <div id="shadersPanel" style="display:none;margin-top:8px">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-                <label><input id="chkGlitch" type="checkbox"> Glitch</label>
-                <div style="flex:1">Intensity <input id="glitchIntensity" type="range" min="0" max="100" step="1" value="30"></div>
-                <input id="glitchVal" class="numInput" value="30">
-                <button id="regenGlitch" class="smallBtn">Regenerate</button>
+            <div id="borderPanel" class="panel-section section-spacer">
+              <div class="section-title">Border</div>
+              <div id="borderTabs" class="segmented" style="margin-bottom:6px"></div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <button id="addBorderBtn" class="smallBtn greenBtn" style="padding:4px 8px;font-size:12px">Upload</button>
+                <input id="borderUpload" type="file" accept="image/*" style="display:none">
+                <div id="borderPreview" class="thumbPreview" style="width:32px;height:32px"></div>
               </div>
-
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-                <label><input id="chkRGB" type="checkbox"> RGB Shift</label>
-                <div style="flex:1">Intensity <input id="rgbIntensity" type="range" min="0" max="200" step="1" value="20"></div>
-                <input id="rgbVal" class="numInput" value="20">
-              </div>
-
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-                <label><input id="chkWave" type="checkbox"> Wave</label>
-                <div style="flex:1">Intensity <input id="waveIntensity" type="range" min="0" max="100" step="1" value="10"></div>
-                <input id="waveVal" class="numInput" value="10">
-              </div>
-
-              <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
-                <label><input id="shadersOnlyBG" type="checkbox"> Apply only to Background</label>
+              <div id="borderTintControls" style="margin-top:6px;display:none">
+                <div class="mutedNote" style="font-size:11px">Tint</div>
+                <div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">
+                  <div style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--muted);min-width:10px">R</span><input id="tR" type="range" min="0" max="255" value="255" style="flex:1;height:14px"><input id="tRval" class="numInput" style="width:36px;padding:2px 4px" value="255"></div>
+                  <div style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--muted);min-width:10px">G</span><input id="tG" type="range" min="0" max="255" value="255" style="flex:1;height:14px"><input id="tGval" class="numInput" style="width:36px;padding:2px 4px" value="255"></div>
+                  <div style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--muted);min-width:10px">B</span><input id="tB" type="range" min="0" max="255" value="255" style="flex:1;height:14px"><input id="tBval" class="numInput" style="width:36px;padding:2px 4px" value="255"></div>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+                  <div id="borderColorPreview" class="bigColorPreview" style="width:32px;height:24px"></div>
+                  <label style="font-size:11px"><input id="applyBorderTint" type="checkbox" checked> Apply</label>
+                </div>
               </div>
             </div>
           </div>
 
-          <div id="borderPanel" class="panel-section">
-            <div class="section-title">Border (Marathon)</div>
-            <div id="borderTabs" class="segmented" style="margin-bottom:8px"></div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <button id="addBorderBtn" class="smallBtn greenBtn">Upload border</button>
-              <input id="borderUpload" type="file" accept="image/*" style="display:none">
-              <div id="borderPreview" class="thumbPreview"></div>
-            </div>
+          <!-- Individual: background info (minimal) -->
+          <div id="individualPanel" style="display:none">
+            <div class="section-title" style="margin-top:8px">Background</div>
+            <div class="mutedNote" style="margin-top:4px;font-size:11px">Drag an image onto canvas to set background. Drag on canvas to pan.</div>
+          </div>
 
-            <div id="borderTintControls" style="margin-top:8px;display:none">
-              <div class="mutedNote">Border tint</div>
-              <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
-                <div>R <input id="tR" type="range" min="0" max="255" value="255"> <input id="tRval" class="numInput" value="255"></div>
-                <div>G <input id="tG" type="range" min="0" max="255" value="255"> <input id="tGval" class="numInput" value="255"></div>
-                <div>B <input id="tB" type="range" min="0" max="255" value="255"> <input id="tBval" class="numInput" value="255"></div>
-              </div>
-              <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
-                <div id="borderColorPreview" class="bigColorPreview"></div>
-                <label><input id="applyBorderTint" type="checkbox" checked> Apply tint</label>
-              </div>
-            </div>
+          <div class="panel-section section-spacer" style="margin-top:auto">
+            <button id="resetAllBtn" class="btn" style="width:100%;font-size:12px;padding:6px">Reset Values</button>
           </div>
 
         </div> <!-- scrollArea -->
@@ -223,6 +373,7 @@
 <script src="js/cropeditor.js"></script>
 <script src="js/dragoffset.js"></script>
 <script src="js/transform.js"></script>
+<script src="js/textoverlay.js"></script>
 <script src="js/app.js"></script>
 
 </body>

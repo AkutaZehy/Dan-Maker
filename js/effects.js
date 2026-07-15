@@ -41,9 +41,6 @@ const Effects = (function(){
       if(document.getElementById('chkRGB').checked){
         applyRGBShift(bgCtx, w, h, parseInt(document.getElementById('rgbIntensity').value,10) || 0);
       }
-      if(document.getElementById('chkWave').checked){
-        applyWave(bgCtx, w, h, parseInt(document.getElementById('waveIntensity').value,10) || 0);
-      }
       
       // Draw processed BG to proc
       pctx.clearRect(0,0,w,h);
@@ -70,10 +67,7 @@ const Effects = (function(){
     if(document.getElementById('chkRGB').checked){
       applyRGBShift(pctx, w, h, parseInt(document.getElementById('rgbIntensity').value,10) || 0);
     }
-    if(document.getElementById('chkWave').checked){
-      applyWave(pctx, w, h, parseInt(document.getElementById('waveIntensity').value,10) || 0);
-    }
-
+    
     return proc;
   }
 
@@ -124,27 +118,6 @@ const Effects = (function(){
     }
     const newImg = new ImageData(out, w, h);
     ctx.putImageData(newImg, 0, 0);
-  }
-
-  function applyWave(ctx, w, h, intensity=10){
-    const imgd = ctx.getImageData(0,0,w,h);
-    const data = imgd.data;
-    const out = ctx.createImageData(w,h);
-    const amp = Math.max(1, intensity/3);
-    const freq = 0.02 + intensity / 1200;
-    for(let y=0;y<h;y++){
-      const dx = Math.floor(Math.sin(y*freq) * amp);
-      for(let x=0;x<w;x++){
-        const sx = Math.min(w-1, Math.max(0, x + dx));
-        const si = (y*w + sx)*4;
-        const di = (y*w + x)*4;
-        out.data[di] = data[si];
-        out.data[di+1] = data[si+1];
-        out.data[di+2] = data[si+2];
-        out.data[di+3] = data[si+3];
-      }
-    }
-    ctx.putImageData(out,0,0);
   }
 
   // regenerate: for glitch, change the seed to produce a new static frame

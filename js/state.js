@@ -8,8 +8,8 @@ const State = (function(){
   const state = {
     mode: 'individual',
     indBg: null,
-    indMeta: { zoom:100, scaleX:100, scaleY:100, rotate:0, offsetX:0, offsetY:0 },
-    symbolMeta: { zoom:100, scaleX:100, scaleY:100, rotate:0 },
+    indMeta: { zoom:100, scaleX:100, scaleY:100, rotate:0, offsetX:0, offsetY:0, flipH:false, flipV:false },
+    symbolMeta: { zoom:100, scaleX:100, scaleY:100, rotate:0, flipH:false, flipV:false },
     marImages: [], // {id,img,name,slot:null,offsetX:0,meta:{zoom:100,scaleX:100,scaleY:100,rotate:0}}
     marBorderImg: null,
     marBorderMode: 'reform',
@@ -21,6 +21,20 @@ const State = (function(){
     applyBorderTint: true,
     applySymbolTint: true,
     showSymbol: true,
+    textSymbol: {
+      enabled: false, text: '',
+      fontFamily: 'EB Garamond', fontSize: 72, fontWeight: 700,
+      color: '#ffffff',
+    },
+    textOverlay: {
+      enabled: false, text: '',
+      layout: 'below', symOffset: 0, textOffset: 0, scale: 100,
+      fontSize: 48, fontFamily: 'EB Garamond', fontWeight: 400,
+      color: '#ffffff',
+      strokeEnabled: false, strokeWidth: 2, strokeColor: '#000000',
+      shadowEnabled: false, shadowColor: '#000000',
+      shadowBlur: 4, shadowOffsetX: 2, shadowOffsetY: 2,
+    },
     glitchSeed: 0,
     SLOTS
   };
@@ -47,7 +61,10 @@ const State = (function(){
         customBorders: state.customBorders.map(b=>({name:b.name,data:b.img.src})),
         borderTint: state.borderTint,
         symbolTint: state.symbolTint,
-        marMeta: state.marImages.map(m=>({id:m.id,slot:m.slot,offsetX:m.offsetX,meta:m.meta}))
+        symbolMeta: state.symbolMeta,
+        marMeta: state.marImages.map(m=>({id:m.id,slot:m.slot,offsetX:m.offsetX,offsetY:m.offsetY,meta:m.meta})),
+        textSymbol: state.textSymbol,
+        textOverlay: state.textOverlay,
       };
       localStorage.setItem('danmaker_final', JSON.stringify(packed));
     }catch(e){}
@@ -71,10 +88,13 @@ const State = (function(){
       }
       if(parsed.borderTint) state.borderTint = parsed.borderTint;
       if(parsed.symbolTint) state.symbolTint = parsed.symbolTint;
+      if(parsed.symbolMeta) Object.assign(state.symbolMeta, parsed.symbolMeta);
+      if(parsed.textSymbol) Object.assign(state.textSymbol, parsed.textSymbol);
+      if(parsed.textOverlay) Object.assign(state.textOverlay, parsed.textOverlay);
       if(parsed.marMeta){
         parsed.marMeta.forEach(mmeta=>{
           const found = state.marImages.find(x=>x.id===mmeta.id);
-          if(found){ found.slot = mmeta.slot; found.offsetX = mmeta.offsetX; found.meta = mmeta.meta || found.meta; }
+          if(found){ found.slot = mmeta.slot; found.offsetX = mmeta.offsetX; found.offsetY = mmeta.offsetY || 0; found.meta = mmeta.meta || found.meta; }
         });
       }
     }catch(e){}
@@ -83,7 +103,7 @@ const State = (function(){
   loadPersistent();
 
   function addMarImage(img, name){
-    state.marImages.push({ id: Date.now()+Math.random(), img, name, slot: null, offsetX:0, meta:{zoom:100,scaleX:100,scaleY:100,rotate:0} });
+    state.marImages.push({ id: Date.now()+Math.random(), img, name, slot: null, offsetX:0, offsetY:0, meta:{zoom:100,scaleX:100,scaleY:100,rotate:0,flipH:false,flipV:false} });
   }
   function findMarById(id){ return state.marImages.find(m=>m.id===id); }
   function addCustomSymbol(img, name){ state.greekList.push({ filename: name, name, img, custom:true, group:'custom' }); savePersistent(); }
